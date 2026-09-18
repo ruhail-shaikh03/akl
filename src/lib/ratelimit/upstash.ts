@@ -3,6 +3,10 @@ import { Redis } from "@upstash/redis";
 
 let redis: Redis | null = null;
 
+export function isRedisConfigured(): boolean {
+  return Boolean(process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN);
+}
+
 /** Lazily constructed so builds/tests without Upstash env vars don't crash at import time. */
 export function getRedis(): Redis {
   if (!redis) {

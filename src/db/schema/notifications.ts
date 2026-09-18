@@ -1,7 +1,7 @@
 import { boolean, index, jsonb, pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 
 export const priorityEnum = pgEnum("priority", ["normal", "high"]);
-export const notifStatusEnum = pgEnum("notif_status", ["sent", "failed"]);
+export const notifStatusEnum = pgEnum("notif_status", ["sent", "failed", "skipped"]);
 
 export const notificationsLog = pgTable(
   "notifications_log",

@@ -1,4 +1,7 @@
-import "dotenv/config";
+import { config } from "dotenv";
+config({ path: ".env.local" });
+config({ path: ".env" });
+
 import { db } from "@/db";
 import { users, personalContext, appSettings, notificationSettings } from "@/db/schema";
 import { eq } from "drizzle-orm";

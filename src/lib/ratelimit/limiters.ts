@@ -1,6 +1,6 @@
 import "server-only";
 import { Ratelimit } from "@upstash/ratelimit";
-import { getRedis } from "./upstash";
+import { getRedis, isRedisConfigured } from "./upstash";
 
 let limiters: {
   login: Ratelimit;
@@ -11,7 +11,22 @@ let limiters: {
   testNotification: Ratelimit;
 } | null = null;
 
-/** Lazily constructed so builds/tests without Upstash env vars don't crash at import time. */
+let warnedOnce = false;
+
+/** Without Upstash configured (e.g. local dev), rate limiting no-ops and every check passes. */
+function rateLimitingDisabled(): boolean {
+  if (!isRedisConfigured()) {
+    if (!warnedOnce) {
+      console.warn(
+        "[ratelimit] UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN are not set — rate limiting is disabled.",
+      );
+      warnedOnce = true;
+    }
+    return true;
+  }
+  return false;
+}
+
 function getLimiters() {
   if (!limiters) {
     const redis = getRedis();
@@ -52,10 +67,12 @@ function getLimiters() {
 }
 
 export async function checkLoginLimit(ip: string, role: string) {
+  if (rateLimitingDisabled()) return { success: true };
   return getLimiters().login.limit(`${ip}:${role}`);
 }
 
 export async function checkChatLimit(userId: string) {
+  if (rateLimitingDisabled()) return { success: true };
   const [hourly, burst] = await Promise.all([
     getLimiters().chat.limit(userId),
     getLimiters().chatBurst.limit(userId),
@@ -64,13 +81,16 @@ export async function checkChatLimit(userId: string) {
 }
 
 export async function checkUploadLimit(userId: string) {
+  if (rateLimitingDisabled()) return { success: true };
   return getLimiters().upload.limit(userId);
 }
 
 export async function checkMutationLimit(userId: string) {
+  if (rateLimitingDisabled()) return { success: true };
   return getLimiters().mutation.limit(userId);
 }
 
 export async function checkTestNotificationLimit(userId: string) {
+  if (rateLimitingDisabled()) return { success: true };
   return getLimiters().testNotification.limit(userId);
 }

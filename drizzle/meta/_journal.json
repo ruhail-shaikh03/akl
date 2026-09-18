@@ -8,6 +8,13 @@
       "when": 1789767031794,
       "tag": "0000_daffy_bulldozer",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1789768504882,
+      "tag": "0001_strong_moon_knight",
+      "breakpoints": true
     }
   ]
 }

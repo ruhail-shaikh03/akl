@@ -1,0 +1,1 @@
+ALTER TYPE "public"."notif_status" ADD VALUE 'skipped';
