@@ -3,7 +3,7 @@ import { requireSession, UnauthorizedError } from "@/lib/auth/guards";
 import { checkUploadLimit } from "@/lib/ratelimit/limiters";
 import { InvalidImageError, uploadImage, type UploadFolder } from "@/lib/blob/upload";
 
-const ALLOWED_FOLDERS: UploadFolder[] = ["gallery", "letters", "bucket-list"];
+const ALLOWED_FOLDERS: UploadFolder[] = ["gallery", "letters", "bucket-list", "reasons"];
 
 export const runtime = "nodejs";
 

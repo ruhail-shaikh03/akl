@@ -40,7 +40,7 @@ export function sniffImageMime(bytes: Uint8Array): string | null {
 
 export class InvalidImageError extends Error {}
 
-export type UploadFolder = "gallery" | "letters" | "bucket-list";
+export type UploadFolder = "gallery" | "letters" | "bucket-list" | "reasons";
 
 export async function uploadImage(
   file: File,
