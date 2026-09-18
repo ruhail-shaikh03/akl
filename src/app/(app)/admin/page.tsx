@@ -1,9 +1,12 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Bell } from "lucide-react";
+import { Bell, Mail } from "lucide-react";
 import { getSession } from "@/lib/auth/session";
 
-const SECTIONS = [{ href: "/admin/notifications", label: "Notifications", icon: Bell }] as const;
+const SECTIONS = [
+  { href: "/admin/letters", label: "Letters", icon: Mail },
+  { href: "/admin/notifications", label: "Notifications", icon: Bell },
+] as const;
 
 export default async function AdminPage() {
   const session = await getSession();
@@ -16,7 +19,7 @@ export default async function AdminPage() {
       <div>
         <h1 className="font-heading text-2xl">Admin</h1>
         <p className="text-sm text-muted-foreground">
-          Letters, reasons, coupons, and personal context management arrive with their own phases.
+          Reasons, coupons, and personal context management arrive with their own phases.
         </p>
       </div>
       <div className="flex flex-col gap-2">

@@ -40,8 +40,11 @@ export function sniffImageMime(bytes: Uint8Array): string | null {
 
 export class InvalidImageError extends Error {}
 
-export async function uploadGalleryImage(
+export type UploadFolder = "gallery" | "letters" | "bucket-list";
+
+export async function uploadImage(
   file: File,
+  folder: UploadFolder = "gallery",
 ): Promise<{ url: string; pathname: string }> {
   if (file.size > MAX_UPLOAD_BYTES) {
     throw new InvalidImageError(`File is too large (max ${MAX_UPLOAD_BYTES / 1024 / 1024}MB)`);
@@ -54,7 +57,7 @@ export async function uploadGalleryImage(
   }
 
   const ext = EXTENSION_BY_MIME[sniffed] ?? "bin";
-  const pathname = `gallery/${crypto.randomUUID()}.${ext}`;
+  const pathname = `${folder}/${crypto.randomUUID()}.${ext}`;
 
   const blob = await put(pathname, Buffer.from(buffer), {
     access: "public",

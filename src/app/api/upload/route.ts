@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireSession, UnauthorizedError } from "@/lib/auth/guards";
 import { checkUploadLimit } from "@/lib/ratelimit/limiters";
-import { InvalidImageError, uploadGalleryImage } from "@/lib/blob/upload";
+import { InvalidImageError, uploadImage, type UploadFolder } from "@/lib/blob/upload";
+
+const ALLOWED_FOLDERS: UploadFolder[] = ["gallery", "letters", "bucket-list"];
 
 export const runtime = "nodejs";
 
@@ -26,9 +28,14 @@ export async function POST(req: NextRequest) {
   if (!file || !(file instanceof File)) {
     return NextResponse.json({ error: "No file provided" }, { status: 400 });
   }
+  const folderRaw = formData?.get("folder");
+  const folder: UploadFolder =
+    typeof folderRaw === "string" && ALLOWED_FOLDERS.includes(folderRaw as UploadFolder)
+      ? (folderRaw as UploadFolder)
+      : "gallery";
 
   try {
-    const { url, pathname } = await uploadGalleryImage(file);
+    const { url, pathname } = await uploadImage(file, folder);
     return NextResponse.json({ blobUrl: url, blobPathname: pathname });
   } catch (err) {
     if (err instanceof InvalidImageError) {
