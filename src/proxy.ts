@@ -19,7 +19,7 @@ async function hasValidSession(req: NextRequest): Promise<boolean> {
   }
 }
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const isApi = req.nextUrl.pathname.startsWith("/api");
   const authed = await hasValidSession(req);
 
