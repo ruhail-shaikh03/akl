@@ -1,5 +1,7 @@
-import { ComingSoon } from "@/components/coming-soon";
+import { getGalleryPhotos } from "./actions";
+import { GalleryClient } from "./GalleryClient";
 
-export default function GalleryPage() {
-  return <ComingSoon title="Gallery" phase="Phase 2" />;
+export default async function GalleryPage() {
+  const photos = await getGalleryPhotos();
+  return <GalleryClient initialPhotos={photos} />;
 }
