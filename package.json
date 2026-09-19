@@ -11,7 +11,8 @@
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "db:seed": "tsx scripts/seed.ts",
-    "hash-passcode": "tsx scripts/hash-passcode.ts"
+    "hash-passcode": "tsx scripts/hash-passcode.ts",
+    "set-passcode": "tsx scripts/set-passcode.ts"
   },
   "dependencies": {
     "@ai-sdk/deepseek": "^3.0.48",
