@@ -29,3 +29,29 @@ function toMinutes(hhmm: string): number {
   const [h, m] = hhmm.split(":").map(Number);
   return h * 60 + m;
 }
+
+/** Whole days between a "yyyy-MM-dd" date and today, in Asia/Karachi. */
+export function daysSince(dateStr: string): number {
+  const today = todayKarachiDate();
+  const msPerDay = 24 * 60 * 60 * 1000;
+  const [fy, fm, fd] = dateStr.split("-").map(Number);
+  const [ty, tm, td] = today.split("-").map(Number);
+  const from = Date.UTC(fy, fm - 1, fd);
+  const to = Date.UTC(ty, tm - 1, td);
+  return Math.round((to - from) / msPerDay);
+}
+
+/** Days until the next occurrence of a "yyyy-MM-dd" birthday/anniversary (month+day only), in Asia/Karachi. */
+export function daysUntilNextAnniversary(dateStr: string): number {
+  const [, month, day] = dateStr.split("-").map(Number);
+  const today = todayKarachiDate();
+  const [ty, tm, td] = today.split("-").map(Number);
+  const msPerDay = 24 * 60 * 60 * 1000;
+  const todayUTC = Date.UTC(ty, tm - 1, td);
+
+  let next = Date.UTC(ty, month - 1, day);
+  if (next < todayUTC) {
+    next = Date.UTC(ty + 1, month - 1, day);
+  }
+  return Math.round((next - todayUTC) / msPerDay);
+}

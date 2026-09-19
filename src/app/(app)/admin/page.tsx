@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Bell, Mail, Heart, Ticket, SmilePlus } from "lucide-react";
+import { Bell, Mail, Heart, Ticket, SmilePlus, UserCog } from "lucide-react";
 import { getSession } from "@/lib/auth/session";
 
 const SECTIONS = [
@@ -8,6 +8,7 @@ const SECTIONS = [
   { href: "/admin/reasons", label: "Reasons", icon: Heart },
   { href: "/admin/coupons", label: "Coupons", icon: Ticket },
   { href: "/admin/mood", label: "Her mood", icon: SmilePlus },
+  { href: "/admin/personal-context", label: "Personal context", icon: UserCog },
   { href: "/admin/notifications", label: "Notifications", icon: Bell },
 ] as const;
 
@@ -21,7 +22,7 @@ export default async function AdminPage() {
     <main className="mx-auto flex max-w-md flex-col gap-6 px-4 pt-safe pt-6">
       <div>
         <h1 className="font-heading text-2xl">Admin</h1>
-        <p className="text-sm text-muted-foreground">Personal context and more arrive with their own phases.</p>
+        <p className="text-sm text-muted-foreground">Manage content and settings here.</p>
       </div>
       <div className="flex flex-col gap-2">
         {SECTIONS.map(({ href, label, icon: Icon }) => (

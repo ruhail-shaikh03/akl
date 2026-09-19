@@ -14,7 +14,7 @@
     "hash-passcode": "tsx scripts/hash-passcode.ts"
   },
   "dependencies": {
-    "@ai-sdk/openai": "^4.0.70",
+    "@ai-sdk/deepseek": "^3.0.48",
     "@base-ui/react": "^1.8.0",
     "@hookform/resolvers": "^5.9.1",
     "@neondatabase/serverless": "^1.1.0",
@@ -35,7 +35,6 @@
     "lucide-react": "^1.47.0",
     "next": "16.3.5",
     "next-themes": "^0.4.6",
-    "openai": "^7.19.0",
     "react": "19.2.8",
     "react-day-picker": "^10.0.1",
     "react-dom": "19.2.8",
