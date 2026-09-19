@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Heart } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { vibrate } from "@/lib/haptics";
 import { drawReason, toggleFavoriteReason } from "./actions";
 
 type DrawnReason = { id: string; text: string; imageUrl: string | null };
@@ -19,6 +20,7 @@ export function ReasonJar({ initialTotal }: { initialTotal: number }) {
   async function handleTapJar() {
     if (phase === "shaking") return;
     setPhase("shaking");
+    vibrate(10);
     const result = await drawReason();
     if (!result.reason) {
       setPhase("idle");
@@ -38,6 +40,7 @@ export function ReasonJar({ initialTotal }: { initialTotal: number }) {
 
   async function handleToggleFavorite() {
     if (!reason || togglingFavorite) return;
+    vibrate(12);
     setTogglingFavorite(true);
     setFavorited((f) => !f);
     try {

@@ -2,16 +2,19 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import Image from "next/image";
-import { Reorder } from "framer-motion";
-import { GripVertical, ImageIcon, ListOrdered, Pencil } from "lucide-react";
+import { ImageIcon, ListOrdered, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { UploadSheet } from "./UploadSheet";
 import { EditPhotoSheet } from "./EditPhotoSheet";
-import { Lightbox } from "./Lightbox";
 import { reorderGalleryPhotos } from "./actions";
 import type { GalleryPhoto } from "./types";
+
+// Both pull in framer-motion — deferred so it's not in the initial gallery bundle.
+const Lightbox = dynamic(() => import("./Lightbox").then((m) => m.Lightbox), { ssr: false });
+const ReorderView = dynamic(() => import("./ReorderView"), { ssr: false });
 
 export function GalleryClient({ initialPhotos }: { initialPhotos: GalleryPhoto[] }) {
   const router = useRouter();
@@ -67,21 +70,7 @@ export function GalleryClient({ initialPhotos }: { initialPhotos: GalleryPhoto[]
       </div>
 
       {reordering ? (
-        <Reorder.Group axis="y" values={photos} onReorder={setPhotos} className="flex flex-col gap-2">
-          {photos.map((photo) => (
-            <Reorder.Item
-              key={photo.id}
-              value={photo}
-              className="flex items-center gap-3 rounded-xl border border-border bg-card p-2"
-            >
-              <GripVertical className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
-              <div className="relative size-14 shrink-0 overflow-hidden rounded-lg">
-                <Image src={photo.blobUrl} alt={photo.caption ?? ""} fill sizes="56px" className="object-cover" />
-              </div>
-              <span className="truncate text-sm text-muted-foreground">{photo.caption || "Untitled"}</span>
-            </Reorder.Item>
-          ))}
-        </Reorder.Group>
+        <ReorderView photos={photos} onReorder={setPhotos} />
       ) : (
         <div className="columns-2 gap-2 sm:columns-3">
           {photos.map((photo, index) => (

@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import { ArrowLeft, Mail } from "lucide-react";
 import { toast } from "sonner";
+import { vibrate } from "@/lib/haptics";
 import { openLetter } from "../actions";
 import type { Letter } from "../types";
 
@@ -17,6 +18,7 @@ export function LetterReveal({ letter }: { letter: Letter }) {
   function handleOpen() {
     if (opening || revealed) return;
     setOpening(true);
+    vibrate(10);
     openLetter(letter.id).catch(() => toast.error("Couldn't mark this as opened, but here it is anyway."));
     setTimeout(() => setRevealed(true), 550);
   }

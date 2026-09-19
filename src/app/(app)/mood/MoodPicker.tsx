@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import { vibrate } from "@/lib/haptics";
 import { submitMoodCheckin } from "./actions";
 
 const MOODS = [
@@ -27,6 +28,7 @@ export function MoodPicker({ onSubmitted }: { onSubmitted: (level: number) => vo
     setSaving(true);
     try {
       await submitMoodCheckin({ level, note: note.trim() || undefined });
+      vibrate(15);
       router.refresh();
       onSubmitted(level);
     } catch {
@@ -42,7 +44,10 @@ export function MoodPicker({ onSubmitted }: { onSubmitted: (level: number) => vo
         {MOODS.map(({ level: l, emoji, label }) => (
           <button
             key={l}
-            onClick={() => setLevel(l)}
+            onClick={() => {
+              vibrate(8);
+              setLevel(l);
+            }}
             aria-label={label}
             aria-pressed={level === l}
             className={cn(

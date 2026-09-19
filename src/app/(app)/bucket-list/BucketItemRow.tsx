@@ -3,10 +3,11 @@
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import confetti from "canvas-confetti";
 import { toast } from "sonner";
 import { Check, Pencil, Trash2, Camera } from "lucide-react";
 import { compressPhoto } from "@/lib/gallery/compress";
+import { celebrate } from "@/lib/confetti";
+import { vibrate } from "@/lib/haptics";
 import { attachCompletionPhoto, deleteBucketItem, toggleCompleteBucketItem } from "./actions";
 import { ItemFormSheet } from "./ItemFormSheet";
 import type { BucketItem } from "./types";
@@ -28,7 +29,8 @@ export function BucketItemRow({ item }: { item: BucketItem }) {
     try {
       await toggleCompleteBucketItem({ id: item.id });
       if (willComplete) {
-        confetti({ particleCount: 100, spread: 80, origin: { y: 0.6 } });
+        vibrate([15, 50, 15, 50, 15]);
+        celebrate({ particleCount: 100, spread: 80, origin: { y: 0.6 } });
         toast("Nice! Want to add a photo of this moment?", {
           action: { label: "Add photo", onClick: () => photoInputRef.current?.click() },
         });

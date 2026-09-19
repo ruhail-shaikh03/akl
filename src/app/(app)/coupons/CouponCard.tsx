@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import confetti from "canvas-confetti";
 import { toast } from "sonner";
 import { Check, Clock } from "lucide-react";
 import { ScratchCanvas } from "@/components/ScratchCanvas";
+import { celebrate } from "@/lib/confetti";
+import { vibrate } from "@/lib/haptics";
 import { Button } from "@/components/ui/button";
 import {
   Drawer,
@@ -38,6 +39,7 @@ export function CouponCard({ coupon }: { coupon: Coupon }) {
 
   async function handleRevealed() {
     setStatus("revealed");
+    vibrate([10, 40, 10]);
     try {
       await scratchCoupon(coupon.id);
     } catch {
@@ -54,7 +56,8 @@ export function CouponCard({ coupon }: { coupon: Coupon }) {
       if (coupon.usageType === "single" || (coupon.maxUses !== null && newUsesCount >= coupon.maxUses)) {
         setStatus("redeemed");
       }
-      confetti({ particleCount: 80, spread: 70, origin: { y: 0.7 } });
+      vibrate([15, 50, 15, 50, 15]);
+      celebrate();
       toast.success("Redeemed! Ruhail's been notified.");
       setRedeemOpen(false);
       setNote("");

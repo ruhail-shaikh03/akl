@@ -124,17 +124,24 @@
   * {
     @apply border-border outline-ring/50;
   }
-  body {
-    @apply bg-background text-foreground;
-  }
   html {
     @apply font-sans;
+    overscroll-behavior-y: contain;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-background text-foreground;
+    overscroll-behavior-y: contain;
   }
   h1,
   h2,
   h3,
   h4 {
     @apply font-heading;
+  }
+  button,
+  a {
+    touch-action: manipulation;
   }
 }
 
