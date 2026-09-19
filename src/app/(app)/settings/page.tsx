@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useTheme } from "next-themes";
@@ -19,6 +20,14 @@ export default function SettingsPage() {
   const session = useSession();
   const { theme, setTheme } = useTheme();
   const router = useRouter();
+  // next-themes doesn't know the persisted theme until after mount, so the
+  // server-rendered markup can't know which button is "active" — avoid a
+  // hydration mismatch by only applying that styling once mounted.
+  const [mounted, setMounted] = useState(false);
+  // Standard next-themes mount-detection pattern — there's no external event
+  // to subscribe to here, just "has the client taken over from SSR yet".
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => setMounted(true), []);
 
   async function handleLogout() {
     await fetch("/api/auth/logout", { method: "POST" });
@@ -42,7 +51,7 @@ export default function SettingsPage() {
                   onClick={() => setTheme(value)}
                   className={cn(
                     "flex flex-col items-center gap-1 rounded-md py-2 text-xs font-medium transition-colors",
-                    theme === value
+                    mounted && theme === value
                       ? "bg-primary text-primary-foreground shadow-sm"
                       : "text-muted-foreground hover:text-foreground",
                   )}
@@ -58,6 +67,7 @@ export default function SettingsPage() {
             <Button
               variant="outline"
               className="justify-start gap-2"
+              nativeButton={false}
               render={<Link href="/admin" />}
             >
               <ShieldCheck className="size-4" aria-hidden="true" />

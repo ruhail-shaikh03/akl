@@ -4,14 +4,19 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Phone, Plus, Send } from "lucide-react";
+import { ArrowLeft, CloudRain, ImageIcon, Laugh, Phone, Plus, Send, Sparkles } from "lucide-react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getRandomMemory, startNewConversation } from "./actions";
+import { CompanionOrb } from "./CompanionOrb";
 import type { ChatMessage } from "./types";
 
-const CHIPS = ["Tell me something nice", "Make me laugh", "Remind me of a memory", "I just need to vent"] as const;
+const CHIPS = [
+  { label: "Tell me something nice", icon: Sparkles },
+  { label: "Make me laugh", icon: Laugh },
+  { label: "Remind me of a memory", icon: ImageIcon },
+  { label: "I just need to vent", icon: CloudRain },
+] as const;
 
 let idCounter = 0;
 function nextId() {
@@ -36,7 +41,7 @@ export function ChatClient({
   const listRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    listRef.current?.scrollTo({ top: listRef.current.scrollHeight });
+    listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" });
   }, [messages]);
 
   async function sendMessage(text: string, opts?: { vent?: boolean }) {
@@ -81,7 +86,7 @@ export function ChatClient({
     }
   }
 
-  async function handleChip(chip: (typeof CHIPS)[number]) {
+  async function handleChip(chip: (typeof CHIPS)[number]["label"]) {
     if (chip === "Remind me of a memory") {
       const memory = await getRandomMemory().catch(() => null);
       if (!memory) {
@@ -110,13 +115,16 @@ export function ChatClient({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-background pt-safe">
-      <header className="flex shrink-0 items-center justify-between gap-2 border-b border-border p-3">
-        <Link href="/" aria-label="Back" className="flex size-9 items-center justify-center rounded-full text-muted-foreground hover:bg-muted">
+    <div className="fixed inset-0 z-[60] flex flex-col bg-background pt-safe">
+      <header className="flex shrink-0 items-center gap-3 border-b border-border px-3 py-2.5">
+        <Link href="/" aria-label="Back" className="flex size-9 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-muted">
           <ArrowLeft className="size-5" aria-hidden="true" />
         </Link>
-        <span className="font-heading text-base">Chat</span>
-        <div className="flex items-center gap-1">
+        <div className="flex flex-1 items-center gap-2.5">
+          <CompanionOrb size={30} />
+          <span className="font-heading text-base italic">Your companion</span>
+        </div>
+        <div className="flex shrink-0 items-center gap-1">
           <button
             onClick={handleNewConversation}
             aria-label="New conversation"
@@ -138,49 +146,73 @@ export function ChatClient({
         </div>
       </header>
 
-      <div ref={listRef} className="flex-1 overflow-y-auto p-4">
+      <div ref={listRef} className="flex-1 overflow-y-auto px-4 py-4">
         <div className="mx-auto flex max-w-md flex-col gap-3">
           {messages.length === 0 && (
-            <p className="mt-8 text-center text-sm text-muted-foreground">
-              Say hi, or tap a chip below to get started.
-            </p>
+            <div className="mt-10 flex flex-col items-center gap-3 text-center">
+              <CompanionOrb size={56} />
+              <p className="font-heading text-lg text-balance italic">Say anything. I&apos;m listening.</p>
+            </div>
           )}
           {messages.map((msg) => {
             if (msg.role === "memory" && msg.memoryPhoto) {
               return (
-                <div key={msg.id} className="flex flex-col gap-1 self-start rounded-2xl border border-border bg-card p-2">
-                  <div className="relative h-40 w-56 overflow-hidden rounded-xl">
-                    <Image src={msg.memoryPhoto.blobUrl} alt={msg.memoryPhoto.caption ?? ""} fill sizes="224px" className="object-cover" />
+                <div key={msg.id} className="flex items-end gap-2 self-start">
+                  <CompanionOrb size={20} />
+                  <div className="flex flex-col gap-1 overflow-hidden rounded-2xl rounded-bl-md border border-border bg-card p-2">
+                    <div className="relative h-40 w-56 overflow-hidden rounded-xl">
+                      <Image src={msg.memoryPhoto.blobUrl} alt={msg.memoryPhoto.caption ?? ""} fill sizes="224px" className="object-cover" />
+                    </div>
+                    {msg.memoryPhoto.caption && <span className="px-1 text-xs text-muted-foreground">{msg.memoryPhoto.caption}</span>}
                   </div>
-                  {msg.memoryPhoto.caption && <span className="px-1 text-xs text-muted-foreground">{msg.memoryPhoto.caption}</span>}
                 </div>
               );
             }
             const isUser = msg.role === "user";
+            const isStreamingEmpty = !msg.content && sending && msg.role === "assistant";
+
+            if (isUser) {
+              return (
+                <div
+                  key={msg.id}
+                  className="max-w-[85%] self-end rounded-2xl rounded-br-md bg-primary px-4 py-2 text-sm text-primary-foreground"
+                >
+                  {msg.content}
+                </div>
+              );
+            }
+
             return (
-              <div
-                key={msg.id}
-                className={`max-w-[85%] rounded-2xl px-4 py-2 text-sm ${
-                  isUser ? "self-end bg-primary text-primary-foreground" : "self-start bg-card border border-border"
-                }`}
-              >
-                {msg.content || (sending && msg.role === "assistant" ? "…" : "")}
+              <div key={msg.id} className="flex max-w-[85%] items-end gap-2 self-start">
+                <CompanionOrb size={20} pulsing={isStreamingEmpty} />
+                <div className="rounded-2xl rounded-bl-md bg-secondary px-4 py-2 text-sm text-secondary-foreground">
+                  {isStreamingEmpty ? (
+                    <span className="flex gap-1 py-1">
+                      <span className="size-1.5 animate-bounce rounded-full bg-current [animation-delay:-0.3s]" />
+                      <span className="size-1.5 animate-bounce rounded-full bg-current [animation-delay:-0.15s]" />
+                      <span className="size-1.5 animate-bounce rounded-full bg-current" />
+                    </span>
+                  ) : (
+                    msg.content
+                  )}
+                </div>
               </div>
             );
           })}
         </div>
       </div>
 
-      <div className="shrink-0 border-t border-border p-2">
-        <div className="mx-auto flex max-w-md gap-2 overflow-x-auto pb-2">
-          {CHIPS.map((chip) => (
+      <div className="shrink-0 border-t border-border p-3">
+        <div className="mx-auto flex max-w-md gap-2 overflow-x-auto pb-3 scrollbar-none">
+          {CHIPS.map(({ label, icon: Icon }) => (
             <button
-              key={chip}
-              onClick={() => handleChip(chip)}
+              key={label}
+              onClick={() => handleChip(label)}
               disabled={sending}
-              className="shrink-0 rounded-full border border-border bg-card px-3 py-1.5 text-xs whitespace-nowrap disabled:opacity-50"
+              className="flex shrink-0 items-center gap-1.5 rounded-full border border-primary/20 bg-card px-3 py-1.5 text-xs whitespace-nowrap disabled:opacity-50"
             >
-              {chip}
+              <Icon className="size-3.5 text-primary" aria-hidden="true" />
+              {label}
             </button>
           ))}
         </div>
@@ -189,18 +221,23 @@ export function ChatClient({
             e.preventDefault();
             sendMessage(input);
           }}
-          className="mx-auto flex max-w-md items-center gap-2 pb-safe"
+          className="mx-auto flex max-w-md items-center gap-1.5 rounded-full bg-secondary py-1 pr-1 pl-4 pb-safe"
         >
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Type a message..."
-            className="text-base"
+            className="h-9 flex-1 border-none bg-transparent text-base dark:bg-transparent"
             disabled={sending}
           />
-          <Button type="submit" size="icon" disabled={sending || !input.trim()} aria-label="Send">
+          <button
+            type="submit"
+            disabled={sending || !input.trim()}
+            aria-label="Send"
+            className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground disabled:opacity-40"
+          >
             <Send className="size-4" aria-hidden="true" />
-          </Button>
+          </button>
         </form>
       </div>
     </div>

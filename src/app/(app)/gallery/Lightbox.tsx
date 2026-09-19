@@ -41,7 +41,7 @@ export function Lightbox({
   if (!photo) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-black/95 pt-safe pb-safe" role="dialog" aria-modal="true">
+    <div className="fixed inset-0 z-[60] flex flex-col bg-black/95 pt-safe pb-safe" role="dialog" aria-modal="true">
       <div className="flex items-center justify-end p-3">
         <button
           onClick={onClose}
